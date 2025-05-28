@@ -16,6 +16,7 @@ class OpenAi
     private object $stream_method;
     private string $customUrl = "";
     private string $proxy = "";
+    private ?string $proxyAuth = null;
     private array $curlInfo = [];
 
     public function __construct($OPENAI_API_KEY)
@@ -880,14 +881,16 @@ class OpenAi
     }
 
     /**
-     * @param  string  $proxy
+     * @param string      $proxy     [scheme://]host[:port]
+     * @param string|null $proxyAuth user:password
      */
-    public function setProxy(string $proxy)
+    public function setProxy(string $proxy, ?string $proxyAuth = null)
     {
         if ($proxy && strpos($proxy, '://') === false) {
-            $proxy = 'https://'.$proxy;
+            $proxy = 'http://'.$proxy;
         }
         $this->proxy = $proxy;
+        $this->proxyAuth = $proxyAuth;
     }
 
     /**
@@ -991,8 +994,11 @@ class OpenAi
             unset($curl_info[CURLOPT_POSTFIELDS]);
         }
 
-        if (! empty($this->proxy)) {
+        if ($this->proxy) {
             $curl_info[CURLOPT_PROXY] = $this->proxy;
+            if ($this->proxyAuth) {
+              $curl_info[CURLOPT_PROXYUSERPWD] = $this->proxyAuth;
+            }
         }
 
         if (array_key_exists('stream', $opts) && $opts['stream']) {

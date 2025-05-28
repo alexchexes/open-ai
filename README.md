@@ -343,6 +343,8 @@ You can use some proxy servers for your requests api;
 
 ````php
 $open_ai->setProxy("http://127.0.0.1:1086");
+// or with credentials
+$open_ai->setProxy("http://127.0.0.1:1086", "myuser:mypassword");
 ````
 
 ## Set header
